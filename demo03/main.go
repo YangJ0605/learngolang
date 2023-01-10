@@ -7,6 +7,7 @@ import (
 // 常量声明
 const pi = 3.1415
 const e = 2.7
+
 // 全局变量 声明不赋值 默认为false
 var isOk bool
 
@@ -32,10 +33,19 @@ const (
 	n9
 )
 
-const  (
+const (
 	n10, n11 = iota + 1, iota + 2
 	n12, n13
 	n14, n15
+)
+
+const (
+	_  = iota
+	KB = 1 << (10 * iota)
+	MB // 1 << (10 * iota) 后面都是这样 iota会依次累加
+	GB
+	TB
+	PB
 )
 
 func main() {
@@ -60,5 +70,6 @@ func main() {
 	fmt.Printf("n7: %v\n", n7)
 	fmt.Printf("n8: %v\n", n8)
 	fmt.Printf("n9: %v\n", n9)
-	fmt.Println("nnn", n10,n11,n12,n13,n14,n15)
+	fmt.Println("nnn", n10, n11, n12, n13, n14, n15)
+	fmt.Println("KB", KB, MB, GB, TB, PB)
 }
