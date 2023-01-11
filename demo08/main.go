@@ -17,6 +17,12 @@ func main() {
 	// fmt.Printf("b: %v\n", b)
 	// fmt.Printf("c: %v\n", c)
 
+	arr := [5]int{1, 2, 3, 4, 7}
+	ss := arr[1:3] // s := a[low:high]
+	fmt.Printf("ss:%v len(ss):%v cap(ss):%v\n", ss, len(ss), cap(ss))
+	ss2 := ss[3:4] // 索引的上限是cap(ss)而不是len(ss) 还会找到原数组身上寻找
+	fmt.Printf("ss2:%v len(ss2):%v cap(ss2):%v\n", ss2, len(ss2), cap(ss2))
+
 	// 基于数组得到切片
 	a := [5]int{1, 2, 3, 4, 5}
 	b := a[:4]
