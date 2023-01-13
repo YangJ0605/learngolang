@@ -1,0 +1,28 @@
+112
+var temp = make([]byte, 128)
+
+var temp = make([]byte, 128)
+
+var temp = make([]byte, 128)
+
+var temp = make([]byte, 128)
+
+var temp = make([]byte, 128)
+
+var temp = make([]byte, 128)
+
+var temp = make([]byte, 128)
+
+var temp = make([]byte, 128)
+
+var temp = make([]byte, 128)
+
+var temp = make([]byte, 128)
+
+var temp = make([]byte, 128)
+
+1
+2
+3ccccchello cccccccc
+ccccc
+hello cccccccc
