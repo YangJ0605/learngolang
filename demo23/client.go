@@ -18,6 +18,8 @@ func main() {
 		return
 	}
 
+	fmt.Println("connect server success")
+
 	input := bufio.NewReader(os.Stdin)
 	for {
 		s, _ := input.ReadString('\n')
@@ -39,7 +41,7 @@ func main() {
 			return
 		}
 
-		fmt.Println("收到的数据为:", string(buf[:n]))
+		fmt.Println("收到server发送的数据为:", string(buf[:n]))
 
 	}
 }

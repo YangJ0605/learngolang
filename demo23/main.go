@@ -21,7 +21,7 @@ func process(conn net.Conn) {
 		}
 		recvStr := string(buf[:n])
 		fmt.Println("收到client端发来的数据：", recvStr)
-		conn.Write([]byte("ok"))
+		conn.Write([]byte("ok-" + recvStr))
 	}
 }
 
@@ -31,6 +31,10 @@ func main() {
 		fmt.Println("listen failed, err:", err)
 		return
 	}
+
+	defer listen.Close()
+
+	fmt.Println("server run at 127.0.0.1:8080")
 
 	for {
 		conn, err := listen.Accept() // 建立链接
