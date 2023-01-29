@@ -47,5 +47,21 @@ func main() {
 		})
 	})
 
+	// 重定向相关
+	r.GET("/redirect", func(ctx *gin.Context) {
+		ctx.Redirect(http.StatusMovedPermanently, "https://www.baidu.com")
+
+	})
+
+	r.GET("/redirect2", func(ctx *gin.Context) {
+		ctx.Request.URL.Path = "/test"
+		r.HandleContext(ctx)
+	})
+
+	r.GET("/test", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"msg": "hello world",
+		})
+	})
 	r.Run(":9000")
 }
