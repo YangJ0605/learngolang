@@ -72,7 +72,7 @@ func (f *FileLogger) splitLogFile(file *os.File) *os.File {
 	if err != nil {
 		panic(fmt.Errorf("open Log file %s file %v", fileName, err))
 	}
-	f.file = fileObj
+
 	return fileObj
 
 }
