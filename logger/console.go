@@ -30,6 +30,9 @@ func (f *ConsoleLevel) log(l Level, format string, args ...interface{}) {
 	t := time.Now().Format("2006-01-02 15:04:05")
 	fileName, line, funcName := GetCallerInfo(3)
 	logMsg := fmt.Sprintf("[%s] [%s:%d] [%s] [%s] %s", t, fileName, line, funcName, getLevelStr(l), msg)
+	if l == Error || l == Fatal {
+		logMsg = fmt.Sprintf("\033[1;31;40m%s\033[0m", logMsg)
+	}
 	fmt.Fprintln(os.Stdout, logMsg)
 
 }
