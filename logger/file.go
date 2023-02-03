@@ -86,21 +86,25 @@ func (f *FileLogger) splitLogFile(file *os.File) *os.File {
 }
 
 func (f *FileLogger) writeMessageFromChan() {
-	for logMessage := range f.logMessageChan {
+
+	for {
+		logMessage, ok := <-f.logMessageChan
 		// 检查文件日志是否超过了maxSize
-		if f.checkShouldSplit(f.file) {
-			f.file = f.splitLogFile(f.file)
-		}
-
-		fmt.Fprintln(f.file, logMessage.message)
-
-		l := parseLogLevel(logMessage.levelStr)
-
-		if l >= Error {
-			if f.checkShouldSplit(f.errFile) {
-				f.errFile = f.splitLogFile(f.errFile)
+		if ok {
+			if f.checkShouldSplit(f.file) {
+				f.file = f.splitLogFile(f.file)
 			}
-			fmt.Fprintln(f.errFile, logMessage.message)
+
+			fmt.Fprintln(f.file, logMessage.message)
+
+			l := parseLogLevel(logMessage.levelStr)
+
+			if l >= Error {
+				if f.checkShouldSplit(f.errFile) {
+					f.errFile = f.splitLogFile(f.errFile)
+				}
+				fmt.Fprintln(f.errFile, logMessage.message)
+			}
 		}
 	}
 }
