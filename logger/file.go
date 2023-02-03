@@ -7,22 +7,29 @@ import (
 	"time"
 )
 
+type LogMessage struct {
+	message  string
+	levelStr string
+}
+
 type FileLogger struct {
 	level              Level
 	fileName, filePath string
 	file               *os.File
 	errFile            *os.File
 	maxSize            int64
+	logMessageChan     chan *LogMessage
 }
 
 // 构造函数
 func NewFileLogger(levelStr string, filePath, fileName string) *FileLogger {
 
 	fileLogger := &FileLogger{
-		level:    parseLogLevel(levelStr),
-		fileName: fileName,
-		filePath: filePath,
-		maxSize:  10 * 1024,
+		level:          parseLogLevel(levelStr),
+		fileName:       fileName,
+		filePath:       filePath,
+		maxSize:        10 * 1024 * 1024,
+		logMessageChan: make(chan *LogMessage, 10000),
 	}
 	fileLogger.initFile()
 	return fileLogger
@@ -45,6 +52,7 @@ func (f *FileLogger) initFile() {
 
 	}
 	f.errFile = errFileObj
+	go f.writeMessageFromChan()
 }
 
 func (f *FileLogger) checkShouldSplit(file *os.File) bool {
@@ -77,6 +85,26 @@ func (f *FileLogger) splitLogFile(file *os.File) *os.File {
 
 }
 
+func (f *FileLogger) writeMessageFromChan() {
+	for logMessage := range f.logMessageChan {
+		// 检查文件日志是否超过了maxSize
+		if f.checkShouldSplit(f.file) {
+			f.file = f.splitLogFile(f.file)
+		}
+
+		fmt.Fprintln(f.file, logMessage.message)
+
+		l := parseLogLevel(logMessage.levelStr)
+
+		if l >= Error {
+			if f.checkShouldSplit(f.errFile) {
+				f.errFile = f.splitLogFile(f.errFile)
+			}
+			fmt.Fprintln(f.errFile, logMessage.message)
+		}
+	}
+}
+
 func (f *FileLogger) log(l Level, format string, args ...interface{}) {
 	if f.level > l {
 		return
@@ -87,20 +115,18 @@ func (f *FileLogger) log(l Level, format string, args ...interface{}) {
 	fileName, line, funcName := GetCallerInfo(3)
 	logMsg := fmt.Sprintf("[%s] [%s:%d] [%s] [%s] %s", t, fileName, line, funcName, getLevelStr(l), msg)
 
-	// 检查文件日志是否超过了maxSize
-
-	if f.checkShouldSplit(f.file) {
-		f.file = f.splitLogFile(f.file)
+	logMessage := &LogMessage{
+		message:  logMsg,
+		levelStr: getLevelStr(l),
 	}
 
-	fmt.Fprintln(f.file, logMsg)
-
-	if l >= Error {
-		if f.checkShouldSplit(f.errFile) {
-			f.errFile = f.splitLogFile(f.errFile)
-		}
-		fmt.Fprintln(f.errFile, logMsg)
+	select {
+	case f.logMessageChan <- logMessage:
+	default:
+		<-f.logMessageChan             // 丢失第一条数据
+		f.logMessageChan <- logMessage // 写入最新的数据
 	}
+
 }
 
 // 方法
